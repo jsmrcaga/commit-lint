@@ -1,0 +1,22 @@
+name: Commit Lint
+description: Lint commits for a pull request with custom validation rules
+
+author: Jo Colina
+
+branding:
+  color: gray-dark
+  icon: shield
+
+inputs:
+  commit_lint_config:
+    description: The config's file path relative to your project
+    required: false
+    default: null
+
+  github_token:
+    description: A token to authenticate to GitHub's API to get the  commit list
+    required: true
+
+runs:
+  using: docker
+  image: Dockerfile

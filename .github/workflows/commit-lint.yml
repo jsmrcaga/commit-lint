@@ -1,0 +1,19 @@
+name: Commit Lint
+
+on:
+  pull_request:
+    types: ['opened', 'edited', 'synchronize']
+
+jobs:
+  lint:
+    name: Lint Commits
+
+    runs-on: ubuntu-latest
+
+    steps:
+      # needs checkout because it runs itself
+      - uses: actions/checkout@v2
+
+      - uses: ./ 
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
