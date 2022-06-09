@@ -1,0 +1,36 @@
+name: Test & Deploy
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize]
+  release:
+    types: [published]
+
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - run: npm i
+      - run: npm test
+
+  publish:
+    runs-on: ubuntu-latest
+
+    if: ${{ github.event_name == 'release' }}
+    needs:
+      - test
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set version
+        run: npm version ${{ github.event.release.tag_name }} --git-tag-version=false
+
+      - run: npm publish
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+
