@@ -1,4 +1,4 @@
-name: Commit Lint
+name: PR/Commit Lint
 description: Lint commits for a pull request with custom validation rules
 
 author: Jo Colina
@@ -9,7 +9,7 @@ branding:
 
 inputs:
   commit_lint_config:
-    description: The config's file path relative to your project
+    description: The config's file path relative to your project's root folder
     required: false
     default: null
 

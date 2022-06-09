@@ -4,7 +4,7 @@ const DEFAULT_CONFIG = require('../config/default');
 class Config {
 	constructor(config) {
 		this.config = {
-			...DEFAULT_CONFIG,
+			...DEFAULT_CONFIG(config),
 			...config
 		};
 
@@ -21,8 +21,12 @@ class Config {
 
 	static load(path=null) {
 		let config = {};
+		// current dir: process.cwd() -> /xxx/xxx/xxx
+		// ex config ./commit-lint.config.js
+		// ex full: /xxx/xxx/xxx/commit-lint.config.js
+
 		if(path) {
-			config = require(path);
+			config = require(Path.join(process.cwd(), path));
 		}
 
 		return new this(config);
