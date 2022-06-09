@@ -53,7 +53,7 @@ class GitHub {
 
 	command(cmd, params, value) {
 		const parameters = Object.entries(params).reduce((agg, [key, value]) => agg.push(`${key}=${value}`), []).join(',')
-		const command = `::${cmd} ${parameters}::${value}`;
+		const command = `::${cmd} ${parameters}::${value}\n`;
 		return process.stdout.write(command);
 	}
 }

@@ -22,7 +22,7 @@ class DefaultReporter {
 		for(const [sha, error] of Object.entries(commits)) {
 			if(error !== true) {
 				has_errors = true;
-				GitHub.command('error', {}, error.toString())
+				GitHub.command('error', {}, error.toString());
 			}
 		}
 
