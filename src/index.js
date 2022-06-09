@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 const { Config } = require('./lib/config');
 const { Linter } = require('./lib/linter');
 const { DefaultReporter } = require('./lib/reporter');
@@ -16,7 +18,7 @@ const reporter = config.reporter || new DefaultReporter(config.reporter_config);
 const pull_request = new PullRequest(EVENT.pull_request);
 
 pull_request.get_commits(REPO).then(commits => {
-	return linter.lint(EVENT.pull_request, commits);
+	return linter.lint(EVENT, commits);
 }).then(([pull_request, commits]) => {
 	return reporter.report({
 		pull_request,
