@@ -23,6 +23,6 @@ module.exports = (config) => ({
 			required: config.default.words_required ?? []
 		}),
 
-		new FormatValidator(config.default.message_format ?? /[A-Z][^\:]+\:\s.+/)
+		new FormatValidator(config.default.message_formats ?? [/^[A-Z][^\:]+\:\s.+$/])
 	]
 });

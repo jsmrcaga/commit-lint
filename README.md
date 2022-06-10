@@ -136,9 +136,9 @@ module.exports = {
 		// List of required words in commit, default is []
 		words_required: ['cat', /somethingelse/],
 
-		// A regex to match the message format. Default is /[A-Z][^\:]+\:\s.+/
+		// A regex to match the message format. Default is [/^[A-Z][^\:]+\:\s.+$/]
 		// For conventional commits you can find multiple examples online
-		message_format: /some_regex/
+		message_formats: [/some_regex/, /some_other_regex/]
 	},
 
 	// Specific config for the Default reporter. Redundant for fail_on_errors

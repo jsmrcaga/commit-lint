@@ -69,15 +69,19 @@ class WordingValidator {
 }
 
 class FormatValidator {
-	constructor({ regexp=null }) {
+	constructor(formats=[]) {
 		// default format is "Commit: xxxxxxxx"
-		this.regexp = regexp && new RegExp(regexp);
+		this.formats = formats.map(regexp => new RegExp(regexp));
 	}
 
 	validate({ commit: ghcommit, pull_request }) {
-		if(this.regexp && !this.regexp.test(ghcommit.commit.message)) {
-			throw new ValidationError(`Commit must match this format: "${this.regexp}"`);
+		for(const format of this.formats) {
+			if(format.test(ghcommit.commit.message)) {
+				return;
+			}
 		}
+
+		throw new ValidationError(`Commit must match one of these formats: ${this.formats.join(', ')}`);
 	}
 }
 
