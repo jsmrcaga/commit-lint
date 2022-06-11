@@ -24,7 +24,7 @@ class Linter {
 			{ pull_request, commit },
 			`Validation failed for commit "${commit.commit.message}" (${commit.sha}).`
 		).then(() => {
-			result[commit.sha] = true;
+			result[commit.sha] = null;
 			return result;
 		}).catch(error => {
 			result[commit.sha] = error;

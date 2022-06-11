@@ -7,28 +7,47 @@ class Reporter {
 }
 
 class DefaultReporter {
-	constructor({ fail_on_errors }) {
+	constructor({ fail_on_errors=true, comment_on_commits=false }) {
 		this.fail_on_errors = fail_on_errors;
+		this.comment_on_commits = comment_on_commits;
 	}
 
-	report({ pull_request, commits }) {
+	report({ event, repo, pull_request, commits }) {
 		let has_errors = false;
+
+		const promises = [];
 
 		if(pull_request) {
 			has_errors = true;
-			GitHub.command('error', {}, pull_request);
+			const p = GitHub.command('error', {}, pull_request);
+			promises.push(p);
 		}
 
 		for(const [sha, error] of Object.entries(commits)) {
-			if(error !== true) {
+			if(error) {
 				has_errors = true;
-				GitHub.command('error', {}, error.toString());
+				const p = GitHub.command('error', {}, error.toString());
+				promises.push(p);
+
+				if(this.comment_on_commits) {
+					const c = GitHub.post(`/repos/${repo}/commits/${sha}/comments`, {
+						body: {
+							body: error.toString()
+						}
+					}).catch(e => {
+						console.error('Commit Comment Error', e);
+					});
+
+					promises.push(c);
+				}
 			}
 		}
 
-		if(has_errors && this.fail_on_errors) {
-			process.exit(1);
-		}
+		return Promise.all(promises).finally(() => {
+			if(has_errors && this.fail_on_errors) {
+				process.exit(1);
+			}
+		});
 	}
 }
 

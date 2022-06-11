@@ -22,7 +22,9 @@ pull_request.get_commits(REPO).then(commits => {
 }).then(([pull_request, commits]) => {
 	return reporter.report({
 		pull_request,
-		commits
+		commits,
+		event: EVENT,
+		repo: REPO
 	});
 }).catch(e => {
 	console.error(e);

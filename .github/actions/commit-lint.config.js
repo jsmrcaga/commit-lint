@@ -1,6 +1,7 @@
 module.exports = {
 	reporter_config: {
-		fail_on_errors: true
+		fail_on_errors: true,
+		comment_on_commits: true
 	},
 
 	default: {
