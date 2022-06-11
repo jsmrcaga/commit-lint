@@ -38,6 +38,8 @@ jobs:
 There are two types of validators, a Commit validator and a Pull request validator.
 Both are essentially the same thing. They can be functions or classes, and the only requirement is that they have a `validate` method if they are objects.
 
+Validators can return promises if needed (for example, if you need to validate against an HTTP request or something else).
+
 For Commit validators, the argument passed to the function/method is `{ commit, pull_request }`.
 
 For Pull request validators, the argument passed to the function/method is `{ commits, pull_request }`.
@@ -86,6 +88,46 @@ class MyPullRequestValidator {
 		}
 	}
 }
+```
+
+## Reporter
+
+The reporter handles error reporting once linting has finished. By default the reporter logs error messages to the GitHub Action runner's output, and can add comments on commits for improved visibility.
+
+You can write your own reporter and pass it via your configuration file. As for validators, reporters are very simple classes which have a `report` method.
+
+This method accepts one argument which is an object containing `{repo, event, pull_request, commits}`;
+
+| Argument | Type | Definition |
+|:--------:|:----:|:----------:|
+| `repo` | String | The owner and name of the repo, ex: `owner/repo` |
+| `event` | Object | The event that triggered this worflow, read from the `GITHUB_EVENT_PATH` env variable |
+| `pull_request` | `ValidationError` or `null` | A `ValidationError` if any Pull Request validators failed |
+| `commits` | Object | An object containing SHA of every commit in the pull request. For every commit sha the value will be `null` or a `ValidationError` if any commit validators failed|
+
+### Custom reporter example
+```js
+class MySimpleReporter {
+	report({ repo, event, pull_request, commits }) {
+		const errors = Object.entries(commits).map(([sha, error]) => {
+			if(!error) {
+				return null;
+			}
+
+			return `Commit ${sha} failed because: ${error.message}`;
+		}).filter(error => error);
+
+		console.error(errors.join('\n'));
+	}
+}
+```
+
+### ValidationError
+`ValidationError`s have a default `toString` method which formats the error in the following format:
+```
+Main error message:
+• Validator 1 error
+• Validator X error
 ```
 
 ## Config
@@ -141,9 +183,12 @@ module.exports = {
 		message_formats: [/some_regex/, /some_other_regex/]
 	},
 
+	// A custom reporter if you want one
+	reporter: new MySimpleReporter(),
 	// Specific config for the Default reporter. Redundant for fail_on_errors
 	reporter_config: {
-		fail_on_errors: true
+		fail_on_errors: true,
+		comment_on_commits: true
 	},
 
 	// List of validators for pull request, default is []
@@ -157,4 +202,26 @@ module.exports = {
 		new MyOwnCommitValidator()
 	]
 }
+```
+
+## Programatic API
+
+You can install this package as a library and require any object you need. Most often you will want to import
+the default configuration builder to avoid code duplication if you only want to add validators. You should also import this
+if you want to create your own validators and throw ValidationErrors.
+
+```sh
+npm i @control/commit-lint
+```
+```js
+const { ValidationError } = require('@control/commit-lint/src/lib/errors');
+const DefaultConfigBuilder = require('@control/commit-lint/src/config/default');
+
+const defaultConfig = DefaultConfigBuilder({
+	default: {
+		// any default values, as described in the Config section
+	}
+});
+
+defaultConfig.commit_validators.push(new MyOwnValidator());
 ```

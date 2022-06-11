@@ -25,6 +25,13 @@ class GitHub {
 			headers.set('Authorization', `Bearer ${this.token}`);
 		}
 
+		if(!headers.get('Content-Type') && body) {
+			headers.set('Content-Type', 'application/json');
+			if(body instanceof Object) {
+				body = JSON.stringify(body);
+			}
+		}
+
 		return fetch(url, {
 			method,
 			body,
@@ -47,6 +54,15 @@ class GitHub {
 	get(path, options={}) {
 		return this.request({
 			path,
+			method: 'GET',
+			...options
+		});
+	}
+
+	post(path, options={}) {
+		return this.request({
+			path,
+			method: 'POST',
 			...options
 		});
 	}
@@ -54,7 +70,15 @@ class GitHub {
 	command(cmd, params, value) {
 		const parameters = Object.entries(params).reduce((agg, [key, value]) => agg.push(`${key}=${value}`), []).join(',')
 		const command = `::${cmd} ${parameters}::${value}\n`;
-		return process.stdout.write(command);
+		return new Promise((resolve, reject) => {
+			process.stdout.write(command, err => {
+				if(err) {
+					return reject(err);
+				}
+
+				return resolve();
+			});
+		});
 	}
 }
 
