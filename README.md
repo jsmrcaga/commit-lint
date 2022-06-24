@@ -51,6 +51,9 @@ For Pull request validators, the argument passed to the function/method is `{ co
 | `commits` | Object[] | The full [list of commits from GitHub's API](https://docs.github.com/en/rest/pulls/pulls#list-commits-on-a-pull-request) |
 | `commit` | Object | A single commit from GitHub's API |
 
+> Please note that this repo will add a `message` and a `body` properties to the `commit` object returned from GitHub. Git does not differenciate between the first line as message and the rest as body, so we'll do it for you.
+> In order to not pollute the original commit object, they are added to the parent object (next to sha).
+
 **Example**
 
 ```js
