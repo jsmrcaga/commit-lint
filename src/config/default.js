@@ -8,7 +8,8 @@ const { Reporter } = require('../lib/reporter');
 
 module.exports = (config) => ({
 	reporter_config: {
-		fail_on_errors: config.default?.fail_on_errors ?? true
+		fail_on_errors: config.default?.fail_on_errors ?? true,
+		comment_on_commits: config.default?.comment_on_commits ?? true,
 	},
 
 	pull_request_validators: [],
